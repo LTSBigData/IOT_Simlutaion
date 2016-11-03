@@ -11,18 +11,17 @@ import com.map.bp_Limit_Map as bp
 
 
 class user(object):
-    # We'll be using the __init__ as a constructor for noActivity level
     def __init__(self, age, gender, category, sleep_count):
-        self.age = age
-        self.gender = gender
-        self.sleep_count = sleep_count
-        self.category = category
-        [self.weight, self.height] = determine_Height_And_Weight(age, gender)
-        self.bmi = determine_BMI(self.weight, self.height)
-        self.bfp = determine_BFP(self.age, self.gender, self.bmi)
-        self.bp, self.bpCategory = determine_BP(self.age, category)
-        self.userID, self.deviceID = uuid.uuid1(), uuid.uuid4()
-        [self.lat, self.lon, self.node_id, self.way_id] = glu.initialize_User_Position()
+        self.age = age  # User age
+        self.gender = gender  # User Gender
+        self.sleep_count = sleep_count  # measure of rate of update of geo-location
+        self.category = category  # category of user Eg. VeryActive, Sedentary etc.
+        [self.weight, self.height] = determine_Height_And_Weight(age, gender)  # Age and gender
+        self.bmi = determine_BMI(self.weight, self.height)  # Body Mass Index
+        self.bfp = determine_BFP(self.age, self.gender, self.bmi)  # Body Fat Percentage
+        self.bp, self.bpCategory = determine_BP(self.age, category)  # Blood Pressure and its category
+        self.userID, self.deviceID = uuid.uuid1(), uuid.uuid4()  # Unique (User ID and Device ID)
+        [self.lat, self.lon, self.node_id, self.way_id] = glu.initialize_User_Position()  # Position of user
 
 
 def determine_Height_And_Weight(age, gender):
@@ -256,6 +255,11 @@ def printUserDetails(user):
     # return value
 
 def send_To_Kafka(user):
+    """
+    Sends an user data to Kafka. Serves as the kafka-producer.
+    :param user: usr.user object : user from the MUL
+    :return: None
+    """
     producer_Topic_1 = 'python-test'
     producer = KafkaProducer(bootstrap_servers='localhost:9092')
     message = printUserDetails(user)
@@ -263,6 +267,11 @@ def send_To_Kafka(user):
     producer.flush()
 
 def send_Time_To_Kafka(time):
+    """
+    Sends the time to Kafka. Redundant at this point. Just for testing purpose being used.
+    :param time: str(datetime): time from the simulation world
+    :return: None
+    """
     producer_Topic_1 = 'python-test'
     producer = KafkaProducer(bootstrap_servers='localhost:9092')
     producer.send(producer_Topic_1, time)

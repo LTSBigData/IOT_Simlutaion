@@ -23,29 +23,46 @@ print MUL + "Initialized with size = " + str(master_User_List_Length)
 # Total Number of users = 10 (pre-existing)
 
 def updateUserList(n=1):
-    # This is for pre-populating the Master User List
+    """
+    This is for pre-populating the Master User List AND adding new users the MUL.
+    :param n: int: serves as the pre-population argument. Denotes initial number of user in MUL
+    :return: None
+    """
+    # Pre-population
     if n != 1:
         for i in numpy.arange(n):
             age, gender = assign_Age_Gender()
             add_User_To_List(age, gender)
         return None
+    # adding n = 1 users to MUL
     age, gender = assign_Age_Gender()
     add_User_To_List(age, gender)
 
 
 def add_User_To_List(age, gender):
+    """
+    Used to add to the MUL. User Category are provided depending on which the category is chosen.
+    For e.g. --> VERY_ACTIVE users has 15% chances of being chosen and so on and so forth. Once the category is
+    assigned, according the age, gender the user is instantiated. Sleep_count is a measure that is specific to each
+    category. Essentially it means that for category say for example 5, sleep_count = 0. This implies that the
+    user of that category will update it's location after that many counts --> so it 'sleeps' for that amount.
+    :param age: int: age of user
+    :param gender: str: Gender of user
+    :return: None
+    """
     userCategoryWeights = numpy.array([15, 20, 30, 20, 15])
     userCategoryWeights = userCategoryWeights/100.0
     choices = ["VERY_ACTIVE", "MOD_ACTIVE", "LIGHT_ACTIVE", "SEDENTARY", "NO_ACTIVITY"]
+    # 0th element since list with single element is returned
     choice_of_userCategory = numpy.random.choice(choices, 1, p=userCategoryWeights)[0]
 
     if choice_of_userCategory == "VERY_ACTIVE":
         sleep_count = 0
         master_User_List.append(usr.user(age, gender, 5, sleep_count))
-        value = "User added with | Age: "
-        value += str(age) + " | "
-        value += "Gender: " + str(gender) + " | "
-        value += "Type: " + choice_of_userCategory
+        # value = "User added with | Age: "
+        # value += str(age) + " | "
+        # value += "Gender: " + str(gender) + " | "
+        # value += "Type: " + choice_of_userCategory
         # print value
         # print len(master_User_List)
         return None
@@ -53,10 +70,10 @@ def add_User_To_List(age, gender):
     elif choice_of_userCategory == "MOD_ACTIVE":
         sleep_count = 1
         master_User_List.append(usr.user(age, gender, 4, sleep_count))
-        value = "User added with | Age: "
-        value += str(age) + " | "
-        value += "Gender: " + str(gender) + " | "
-        value += "Type: " + choice_of_userCategory
+        # value = "User added with | Age: "
+        # value += str(age) + " | "
+        # value += "Gender: " + str(gender) + " | "
+        # value += "Type: " + choice_of_userCategory
         # print value
         # print len(master_User_List)
         return None
@@ -64,10 +81,10 @@ def add_User_To_List(age, gender):
     elif choice_of_userCategory == "LIGHT_ACTIVE":
         sleep_count = 2
         master_User_List.append(usr.user(age, gender, 3, sleep_count))
-        value = "User added with | Age: "
-        value += str(age) + " | "
-        value += "Gender: " + str(gender) + " | "
-        value += "Type: " + choice_of_userCategory
+        # value = "User added with | Age: "
+        # value += str(age) + " | "
+        # value += "Gender: " + str(gender) + " | "
+        # value += "Type: " + choice_of_userCategory
         # print value
         # print len(master_User_List)
         return None
@@ -75,10 +92,10 @@ def add_User_To_List(age, gender):
     elif choice_of_userCategory == "SEDENTARY":
         sleep_count = 3
         master_User_List.append(usr.user(age, gender, 2, sleep_count))
-        value = "User added with | Age: "
-        value += str(age) + " | "
-        value += "Gender: " + str(gender) + " | "
-        value += "Type: " + choice_of_userCategory
+        # value = "User added with | Age: "
+        # value += str(age) + " | "
+        # value += "Gender: " + str(gender) + " | "
+        # value += "Type: " + choice_of_userCategory
         # print value
         # print len(master_User_List)
         return None
@@ -86,16 +103,20 @@ def add_User_To_List(age, gender):
     elif choice_of_userCategory == "NO_ACTIVITY":
         sleep_count = 4
         master_User_List.append(usr.user(age, gender, 1, sleep_count))
-        value = "User added with | Age: "
-        value += str(age) + " | "
-        value += "Gender: " + str(gender) + " | "
-        value += "Type: " + choice_of_userCategory
+        # value = "User added with | Age: "
+        # value += str(age) + " | "
+        # value += "Gender: " + str(gender) + " | "
+        # value += "Type: " + choice_of_userCategory
         # print value
         # print len(master_User_List)
         return None
 
 
 def assign_Age_Gender():
+    """
+    Function simply produces an age and a gender according the weights/probabilities pre-provided. Takes no arg.
+    :return: int: age, str: gender_Choice
+    """
     age_Weights = numpy.array([24.1, 64.8, 11.1])
     age_Weights = age_Weights/100.0
     age_Category = [1, 2, 3]
@@ -110,6 +131,11 @@ def assign_Age_Gender():
 
 
 def get_Age_Limits(category):
+    """
+    Function returns the limits of age for assign_Age_Gender(). Created for modularity ONLY.
+    :param category: int: category here represents the number 1, 2, 3 which basically has 3 different limits.
+    :return: list:[lower limit, upper limit]
+    """
     if category == 1:
         return [5, 17]
     elif category == 2:
@@ -122,6 +148,7 @@ updateUserList(n=4)
 
 print MUL + "Pre-populated with :" + str(len(master_User_List)) + " users"
 
+# For testing single addition of users
 for i in range(5):
     updateUserList()
 
@@ -129,7 +156,9 @@ master_User_List_Length = len(master_User_List)
 
 print MUL + "Total users : " + str(master_User_List_Length)
 
+# total_hours keeps a measure of the time in the simulation.
 total_hours = 12
+# Initiate the simulation world time with today's date at 00:00:00 hrs
 simulation_World_Time = midnight_time
 
 print dt.datetime.now()

@@ -22,7 +22,9 @@ def extractFromXML():
 
 def createMap1_Map2():
     '''
-    This portion of the code parses the XML files
+    This portion of the code parses the XML files. Creates 2 maps.
+    Map1 --> way_Node_Map --> first element is way_id, next elements all node_id's in sequential order as they appear.
+    Map2 --> node_coordinates --> each node_id is mapped to a set of latitude and longitude.
     '''
     way_Node_Mapping = open("D:/Users/rajsarka/Documents/FITSIM/resources/way_Node_Map", "w")
     coordList = open("D:/Users/rajsarka/Documents/FITSIM/resources/node_Coordinates", "w")
@@ -69,6 +71,15 @@ def createMap1_Map2():
 
 
 def createMap3():
+    '''
+    Creates a reverse map linking node_id's to way_id's. Essentially made for faster mapping used in updating user
+    location. The algorithm basically takes in a node_id from node_Coordinates, searches for the way_id's which
+    contains that specific node_id in the file way_Node_Map, retrieves the way_id into a list of way_id's for that
+    node_id. Reverse-Mapping for faster searches later on. DISCLAIMER: this is a brute force algorithm. It could
+    probably be made a little bit faster by other methods. NOT IDEAL.
+    IF YOU RUN THIS FUNCTION, IT'LL TAKE QUITE SOMETIME TO FINISH.
+    :return: None
+    '''
     node_Way_Mapping = open("D:/Users/rajsarka/Documents/FITSIM/resources/node_Way_Map", "w")
 
     line_Coord = ln.getlines('D:/Users/rajsarka/Documents/FITSIM/resources/node_Coordinates')
@@ -85,7 +96,7 @@ def createMap3():
 
         node_id = line.split(",")[0]
         value += node_id
-
+        # 2 for loops should always be avoided. But in this case there is no other way I could think of.
         for line_1 in line_Way:
 
             lineList = line_1.strip().split(",")
