@@ -1,8 +1,11 @@
-import classDefinition_User as usr
 import datetime as dt
-from datetime import time
-import numpy
 import random
+from datetime import time
+
+import numpy
+
+import classDefinition_User as usr
+import com.geoSpatialMap.geoLocation_User as glu
 
 MUL = "*** MASTER USER LIST *** "
 currentDate = dt.date.today()
@@ -37,7 +40,8 @@ def add_User_To_List(age, gender):
     choice_of_userCategory = numpy.random.choice(choices, 1, p=userCategoryWeights)[0]
 
     if choice_of_userCategory == "VERY_ACTIVE":
-        master_User_List.append(usr.user(age, gender, 5))
+        sleep_count = 0
+        master_User_List.append(usr.user(age, gender, 5, sleep_count))
         value = "User added with | Age: "
         value += str(age) + " | "
         value += "Gender: " + str(gender) + " | "
@@ -47,7 +51,8 @@ def add_User_To_List(age, gender):
         return None
 
     elif choice_of_userCategory == "MOD_ACTIVE":
-        master_User_List.append(usr.user(age, gender, 4))
+        sleep_count = 1
+        master_User_List.append(usr.user(age, gender, 4, sleep_count))
         value = "User added with | Age: "
         value += str(age) + " | "
         value += "Gender: " + str(gender) + " | "
@@ -57,7 +62,8 @@ def add_User_To_List(age, gender):
         return None
 
     elif choice_of_userCategory == "LIGHT_ACTIVE":
-        master_User_List.append(usr.user(age, gender, 3))
+        sleep_count = 2
+        master_User_List.append(usr.user(age, gender, 3, sleep_count))
         value = "User added with | Age: "
         value += str(age) + " | "
         value += "Gender: " + str(gender) + " | "
@@ -67,7 +73,8 @@ def add_User_To_List(age, gender):
         return None
 
     elif choice_of_userCategory == "SEDENTARY":
-        master_User_List.append(usr.user(age, gender,2))
+        sleep_count = 3
+        master_User_List.append(usr.user(age, gender, 2, sleep_count))
         value = "User added with | Age: "
         value += str(age) + " | "
         value += "Gender: " + str(gender) + " | "
@@ -77,7 +84,8 @@ def add_User_To_List(age, gender):
         return None
 
     elif choice_of_userCategory == "NO_ACTIVITY":
-        master_User_List.append(usr.user(age, gender, 1))
+        sleep_count = 4
+        master_User_List.append(usr.user(age, gender, 1, sleep_count))
         value = "User added with | Age: "
         value += str(age) + " | "
         value += "Gender: " + str(gender) + " | "
@@ -110,11 +118,11 @@ def get_Age_Limits(category):
         return [65, 100]
 
 # Pre-populating the master user list
-updateUserList(n=5)
+updateUserList(n=4)
 
 print MUL + "Pre-populated with :" + str(len(master_User_List)) + " users"
 
-for i in range(10):
+for i in range(5):
     updateUserList()
 
 master_User_List_Length = len(master_User_List)
@@ -124,11 +132,19 @@ print MUL + "Total users : " + str(master_User_List_Length)
 total_hours = 12
 simulation_World_Time = midnight_time
 
+print dt.datetime.now()
 
 while(total_hours != 0):
     print simulation_World_Time
+    print dt.datetime.now()
     usr.send_Time_To_Kafka(str(simulation_World_Time))
     for i in range(master_User_List_Length):
+
         usr.printUserDetails(master_User_List[i])
+        glu.updateLocation_User(master_User_List[i])
+
     simulation_World_Time = simulation_World_Time + dt.timedelta(hours=1)
     total_hours -= 1
+    print dt.datetime.now()
+
+print dt.datetime.now()

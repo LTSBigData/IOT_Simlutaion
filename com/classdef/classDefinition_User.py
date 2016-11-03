@@ -1,70 +1,28 @@
+import math
+import random as rn
+import uuid
+
+import numpy as np
+from kafka import KafkaProducer
+
+import com.geoSpatialMap.geoLocation_User as glu
 import com.map.age_Weight_Heigt_Map_Kids as wt_ht_map
 import com.map.bp_Limit_Map as bp
-import random as rn
-import math
-import numpy as np
-import uuid
-from kafka import KafkaProducer
 
 
 class user(object):
     # We'll be using the __init__ as a constructor for noActivity level
-    def __init__(self, age, gender, category):
+    def __init__(self, age, gender, category, sleep_count):
         self.age = age
         self.gender = gender
+        self.sleep_count = sleep_count
+        self.category = category
         [self.weight, self.height] = determine_Height_And_Weight(age, gender)
         self.bmi = determine_BMI(self.weight, self.height)
         self.bfp = determine_BFP(self.age, self.gender, self.bmi)
         self.bp, self.bpCategory = determine_BP(self.age, category)
         self.userID, self.deviceID = uuid.uuid1(), uuid.uuid4()
-
-    #
-    # @classmethod
-    # def veryActive(self, age, gender):
-    #     self.age = age
-    #     self.gender = gender
-    #     [self.weight, self.height] = determine_Height_And_Weight(age, gender)
-    #     self.bmi = determine_BMI(self.weight, self.height)
-    #     self.bfp = determine_BFP(self.age, self.gender, self.bmi)
-    #     self.bp, self.bpCategory = determine_BP(self.age, 5)
-    #     self.userID, self.deviceID = uuid.uuid1(), uuid.uuid4()
-    #     return self
-    #     # print 1
-    #
-    # @classmethod
-    # def moderatelyActive(self, age, gender):
-    #     self.age = age
-    #     self.gender = gender
-    #     [self.weight, self.height] = determine_Height_And_Weight(age, gender)
-    #     self.bmi = determine_BMI(self.weight, self.height)
-    #     self.bfp = determine_BFP(self.age, self.gender, self.bmi)
-    #     self.bp, self.bpCategory = determine_BP(self.age, 4)
-    #     self.userID, self.deviceID = uuid.uuid1(), uuid.uuid4()
-    #     return self
-    #     # print 2
-    #
-    # @classmethod
-    # def lightlyActive(self, age, gender):
-    #     self.age = age
-    #     self.gender = gender
-    #     [self.weight, self.height] = determine_Height_And_Weight(age, gender)
-    #     self.bmi = determine_BMI(self.weight, self.height)
-    #     self.bfp = determine_BFP(self.age, self.gender, self.bmi)
-    #     self.bp, self.bpCategory = determine_BP(self.age, 3)
-    #     self.userID, self.deviceID = uuid.uuid1(), uuid.uuid4()
-    #     return self
-    #     # print 3
-    #
-    # @classmethod
-    # def sedentary(self, age, gender):
-    #     self.age = age
-    #     self.gender = gender
-    #     [self.weight, self.height] = determine_Height_And_Weight(age, gender)
-    #     self.bmi = determine_BMI(self.weight, self.height)
-    #     self.bfp = determine_BFP(self.age, self.gender, self.bmi)
-    #     self.bp, self.bpCategory = determine_BP(self.age, 2)
-    #     self.userID, self.deviceID = uuid.uuid1(), uuid.uuid4()
-    #     return self
+        [self.lat, self.lon, self.node_id, self.way_id] = glu.initialize_User_Position()
 
 
 def determine_Height_And_Weight(age, gender):
@@ -288,8 +246,12 @@ def printUserDetails(user):
     value += "BFP: " + floatingPointFormatter.format(user.bfp) + "%" + " | "
     value += "Blood Pressure: (" + str(user.bp[0]) + "," + str(user.bp[1]) + ")" + " mmHg" + " | "
     value += "Blood Pressure Category: " + user.bpCategory + " | "
+    # value += "User Category: " + str(user.category) + " | "
     value += "User ID: " + str(user.userID) + " | "
-    value += "Device ID: " + str(user.deviceID)
+    value += "Device ID: " + str(user.deviceID) + " | "
+    value += "Location: Lat: " + user.lat + ", Lon: " + user.lon + " | "
+    value += "Current NodeID: " + user.node_id + " | "
+    value += "Current WayID: " + user.way_id
     print value
     # return value
 
