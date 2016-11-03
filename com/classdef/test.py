@@ -24,7 +24,7 @@ print MUL + "Initialized with size = " + str(master_User_List_Length)
 
 def updateUserList(n=1):
     """
-    This is for pre-populating the Master User List AND adding new users the MUL.
+    This pre-populates the Master User List AND adding new users the MUL.
     :param n: int: serves as the pre-population argument. Denotes initial number of user in MUL
     :return: None
     """
