@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="6c1a672b-437b-48cb-8fd3-6a07f5748a55" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/com/geoSpatialMap/xmlDataExtractor.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/com/geoSpatialMap/xmlTryouts.py" afterPath="" />
+    <list default="true" id="6c1a672b-437b-48cb-8fd3-6a07f5748a55" name="Default" comment="Added module: Movement and user movement rate">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/com/geoSpatialMap/dataExtractor_Mapper.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/com/geoSpatialMap/geoLocation_User.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/com/classdef/classDefinition_User.py" afterPath="$PROJECT_DIR$/com/classdef/classDefinition_User.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/com/classdef/test.py" afterPath="$PROJECT_DIR$/com/classdef/test.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/com/geoSpatialMap/test.py" afterPath="$PROJECT_DIR$/com/geoSpatialMap/test.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/node_Way_Map" afterPath="$PROJECT_DIR$/resources/node_Way_Map" />
     </list>
     <ignored path="FITSIM.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -45,7 +40,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="test.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="test.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/com/classdef/test.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="354">
@@ -55,7 +50,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="geoLocation_User.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="geoLocation_User.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/com/geoSpatialMap/geoLocation_User.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="-3">
@@ -95,6 +90,7 @@
   <component name="Git.Settings">
     <option name="PREVIOUS_COMMIT_AUTHORS">
       <list>
+        <option value="Sarkar &lt;rajarshi.sarkar@capgemini.com&gt;" />
         <option value="rajarshisarkar21@gmail.com" />
       </list>
     </option>
@@ -153,7 +149,74 @@
       <pane id="Scope" />
       <pane id="Scratches" />
       <pane id="ProjectPane">
-        <subPane />
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="FITSIM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="FITSIM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="FITSIM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="FITSIM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="FITSIM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="com" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="FITSIM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="FITSIM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="com" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="geoSpatialMap" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="FITSIM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="FITSIM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="com" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="classdef" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
       </pane>
     </panes>
   </component>
@@ -419,13 +482,21 @@
       <option name="presentableId" value="Default" />
       <updated>1477473181064</updated>
     </task>
+    <task id="LOCAL-00001" summary="Added module: Movement and user movement rate">
+      <created>1478184573077</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1478184573077</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
     <editor active="false" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.26339287" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26339287" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32935154" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32935154" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -526,7 +597,7 @@
         <state relative-caret-position="1241">
           <caret line="97" column="25" selection-start-line="97" selection-start-column="25" selection-end-line="97" selection-end-column="25" />
           <folding>
-            <element signature="e#0#34#0" expanded="true" />
+            <element signature="e#0#34#0" expanded="false" />
             <element signature="e#85#688#0" expanded="false" />
             <element signature="e#718#2070#0" expanded="false" />
             <element signature="e#1181#1591#0" expanded="false" />
@@ -869,7 +940,7 @@
         <state relative-caret-position="102">
           <caret line="21" column="22" selection-start-line="21" selection-start-column="22" selection-end-line="21" selection-end-column="22" />
           <folding>
-            <element signature="e#0#34#0" expanded="true" />
+            <element signature="e#0#34#0" expanded="false" />
             <element signature="e#85#688#0" expanded="false" />
             <element signature="e#718#2070#0" expanded="false" />
             <element signature="e#1181#1591#0" expanded="false" />
@@ -892,22 +963,6 @@
         <state relative-caret-position="492">
           <caret line="32" column="4" selection-start-line="32" selection-start-column="4" selection-end-line="32" selection-end-column="4" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/com/geoSpatialMap/geoLocation_User.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-3">
-          <caret line="72" column="0" selection-start-line="72" selection-start-column="0" selection-end-line="72" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
-            <element signature="e#635#983#0" expanded="false" />
-            <element signature="e#2100#2714#0" expanded="false" />
-            <element signature="e#1282#1498#0" expanded="false" />
-            <element signature="e#1548#2054#0" expanded="false" />
-            <element signature="e#2100#2714#0" expanded="false" />
-            <element signature="e#2753#3540#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -938,6 +993,22 @@
         <state relative-caret-position="354">
           <caret line="131" column="16" selection-start-line="131" selection-start-column="16" selection-end-line="131" selection-end-column="16" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/com/geoSpatialMap/geoLocation_User.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3">
+          <caret line="72" column="0" selection-start-line="72" selection-start-column="0" selection-end-line="72" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#22#0" expanded="true" />
+            <element signature="e#635#983#0" expanded="false" />
+            <element signature="e#2100#2714#0" expanded="false" />
+            <element signature="e#1282#1498#0" expanded="false" />
+            <element signature="e#1548#2054#0" expanded="false" />
+            <element signature="e#2100#2714#0" expanded="false" />
+            <element signature="e#2753#3540#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
