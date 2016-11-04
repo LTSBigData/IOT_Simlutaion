@@ -172,7 +172,5 @@ def updateLocation_User(user):
         user.node_id = next_node_ID
         user.way_id = next_way_ID
         user.sleep_count = updateSleepCount(current_sleep_count, category=user.category)
-        return None
     else:
         user.sleep_count = updateSleepCount(current_sleep_count)
-        return None

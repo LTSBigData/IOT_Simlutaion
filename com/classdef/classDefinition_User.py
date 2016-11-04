@@ -8,10 +8,14 @@ from kafka import KafkaProducer
 import com.geoSpatialMap.geoLocation_User as glu
 import com.map.age_Weight_Heigt_Map_Kids as wt_ht_map
 import com.map.bp_Limit_Map as bp
+import com.map.user_Category_Map as category
 
+MAX_PULSE_BELOW40 = 220
+MAX_PULSE_ABOVE40 = 208
+ABOVE_40_CONST = 0.75
 
 class user(object):
-    def __init__(self, age, gender, category, sleep_count):
+    def __init__(self, age, gender, category, sleep_count, initiation_Time):
         self.age = age  # User age
         self.gender = gender  # User Gender
         self.sleep_count = sleep_count  # measure of rate of update of geo-location
@@ -22,6 +26,10 @@ class user(object):
         self.bp, self.bpCategory = determine_BP(self.age, category)  # Blood Pressure and its category
         self.userID, self.deviceID = uuid.uuid1(), uuid.uuid4()  # Unique (User ID and Device ID)
         [self.lat, self.lon, self.node_id, self.way_id] = glu.initialize_User_Position()  # Position of user
+        self.pulse = initPulse(self.age)
+        self.temp = initBodyTemp()
+        send_To_Kafka_NewUser(self)
+        send_To_Kafka_User_Details(initiation_Time, self)
 
 
 def determine_Height_And_Weight(age, gender):
@@ -230,6 +238,341 @@ def returnBP_Value(bpChoice, age):
         return value
 
 
+def getPulseTargetLimit(age, MAXPULSE_Limit=False):
+    if MAXPULSE_Limit == False:
+        if age <= 40:
+            value = MAX_PULSE_BELOW40 - age
+            targetLow = math.ceil(value * 0.50)
+            targetHigh = math.ceil(value * 0.85)
+            return [targetLow, targetHigh]
+        else:
+            value = MAX_PULSE_ABOVE40 - (0.75 * age)
+            targetLow = math.ceil(value * 0.50)
+            targetHigh = math.ceil(value * 0.85)
+            return [targetLow, targetHigh]
+    elif MAXPULSE_Limit == True:
+        if age <= 40:
+            value = MAX_PULSE_BELOW40 - age
+            targetLow = math.ceil(value * 0.50)
+            targetHigh = math.ceil(value * 0.85)
+            return [targetLow, targetHigh, value]
+        else:
+            value = MAX_PULSE_ABOVE40 - (0.75 * age)
+            targetLow = math.ceil(value * 0.50)
+            targetHigh = math.ceil(value * 0.85)
+            return [targetLow, targetHigh, value]
+
+
+def getTemp(next_Temp_Cat):
+    if next_Temp_Cat == 1:
+        [low_lim, up_lim] = [36.5, 37.5]
+        temp = rn.uniform(low_lim, up_lim)
+        return temp
+    elif next_Temp_Cat == 2:
+        [low_lim, up_lim] = [37.5, 38.3]
+        temp = rn.uniform(low_lim, up_lim)
+        return temp
+    elif next_Temp_Cat == 3:
+        [low_lim, up_lim] = [38.3, 39.5]
+        temp = rn.uniform(low_lim, up_lim)
+        return temp
+    elif next_Temp_Cat == 4:
+        [low_lim, up_lim] = [39.5, 41.5]
+        temp = rn.uniform(low_lim, up_lim)
+        return temp
+
+
+def getNextTemp():
+    weights = np.array([85, 14, 0.5, 0.5]) / 100.0
+    temp_category = [1, 2, 3, 4]
+    next_Temp_Cat = np.random.choice(temp_category, 1, p=weights)
+    next_Temp = getTemp(next_Temp_Cat)
+    return next_Temp
+
+
+def getStdDev_WRT_Temp(a, b, temp):
+    '''
+    Returns either sigma or -sigma of 2 numbers.
+    :param a: float: Number 1
+    :param b: float: Number 2
+    :return: float: sigma or -sigma
+    '''
+    choice = 0
+    tempFormatter = '{:4.2f}'
+    current_temp = temp
+    next_temp = tempFormatter.format(getNextTemp())
+    if current_temp == next_temp:
+        choice = 0.0
+    elif current_temp < next_temp:
+        choice = 1.0
+    elif current_temp > next_temp:
+        choice = -1.0
+    stdDev = np.std([float(a), float(b)])
+    value = stdDev * choice
+    return [value, next_temp]
+
+
+def getPulseValue(pulse_Choice, currentPulse, maxLim_Pulse, temp):
+    if pulse_Choice == 1:
+        lowLim = 0.20 * maxLim_Pulse  # 20% of MAX
+        upLim = 0.40 * maxLim_Pulse  # 40% of MAX
+        value = math.ceil(rn.uniform(lowLim, upLim))  # first choice is between 20 -- 40 %
+        # Instead of returning just a random value within the range, this finds the standard deviation and then simply
+        # adds that to the present pulse rate (can be both positive and negative) so that it has a continuation.
+        # Same logic for all the values of pulse_Choice
+        [toAdd, next_temp] = getStdDev_WRT_Temp(value, currentPulse, temp)
+        return [(value + toAdd), next_temp]
+    elif pulse_Choice == 2:
+        lowLim = 0.40 * maxLim_Pulse  # 40% of MAX
+        upLim = 0.50 * maxLim_Pulse  # 50% of MAX
+        value = math.ceil(rn.uniform(lowLim, upLim))  # first choice is between 40 -- 50 %
+        [toAdd, next_temp] = getStdDev_WRT_Temp(value, currentPulse, temp)
+        return [(value + toAdd), next_temp]
+    elif pulse_Choice == 3:
+        lowLim = 0.50 * maxLim_Pulse  # 50% of MAX
+        upLim = 0.85 * maxLim_Pulse  # 85% of MAX
+        value = math.ceil(rn.uniform(lowLim, upLim))  # first choice is between 40 -- 50 %
+        [toAdd, next_temp] = getStdDev_WRT_Temp(value, currentPulse, temp)
+        return [(value + toAdd), next_temp]
+    elif pulse_Choice == 4:
+        lowLim = 0.85 * maxLim_Pulse  # 85% of MAX
+        upLim = 0.95 * maxLim_Pulse  # 95% of MAX
+        value = math.ceil(rn.uniform(lowLim, upLim))  # first choice is between 40 -- 50 %
+        [toAdd, next_temp] = getStdDev_WRT_Temp(value, currentPulse, temp)
+        return [(value + toAdd), next_temp]
+
+
+def initPulse(age):
+    '''
+    When user is instantiated, it assigns a normal pulse rate.
+    :param age: int: Age of user
+    :return value: float: Initial pulse rate of user
+    '''
+    [targetLow, targetHigh] = getPulseTargetLimit(age)
+    value = math.ceil(rn.uniform(targetLow, targetHigh))
+    return value
+
+
+def initBodyTemp():
+    '''
+    Assigns a normal body temperature when an user instantiates
+    :return: str: body temperature in celsius
+    '''
+    tempFormatter = '{:4.2f}'
+    lower_limit = 36.5
+    upper_limit = 37.5
+    value = rn.uniform(lower_limit, upper_limit)
+    return tempFormatter.format(value)
+
+
+def updatePulse_BodyTemp(age, category, bpCategory, pulse, temp):
+    '''
+    Returns a pulse rate value of the user.
+    :param age: int: Age of user
+    :param category: int: Activity Category of user. Ranges from 5 to 1. 5 being most active.
+    :param bpCategory: str: Blood Pressure category of the user. Consists of 6 categories.
+    :param pulse: float: Current Pulse Rate of the user.
+    :return: float: next pulse rate value
+    '''
+    # Taking only the maximum pulse of that age. It is 3rd element of the returned list
+    maxLim_Pulse = getPulseTargetLimit(age, MAXPULSE_Limit=True)[2]
+    if bpCategory == "LOW":
+        if category == 5:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([2, 34, 59, 5]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+        elif category == 4:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([2.2, 37.7, 55, 5.1]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+        elif category == 3:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([2.4, 41.4, 51, 5.2]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+        elif category == 2:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([2.6, 45.1, 47, 5.3]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+        elif category == 1:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([2.8, 48.8, 43, 5.4]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+
+    elif bpCategory == "NORMAL":
+        if category == 5:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([1, 23, 69, 7]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+        elif category == 4:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([1.2, 25.6, 66, 7.2]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+        elif category == 3:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([1.4, 28.2, 63, 7.4]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+        elif category == 2:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([1.6, 30.8, 60, 7.6]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+        elif category == 1:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([1.8, 33.2, 57, 8]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+
+    elif bpCategory == "PREHYP":
+        if category == 5:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([0.5, 12.5, 79, 8]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+        elif category == 4:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([0.6, 15.2, 76, 8.2]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+        elif category == 3:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([0.7, 17.9, 73, 8.4]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+        elif category == 2:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([0.8, 20.6, 70, 8.6]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+        elif category == 1:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([0.9, 23.3, 67, 8.8]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+
+    elif bpCategory == "HYP_1":
+        if category == 5:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([0.5, 0.5, 79, 20]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+        elif category == 4:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([0.6, 3.2, 76, 20.2]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+        elif category == 3:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([0.7, 5.9, 73, 20.4]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+        elif category == 2:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([0.8, 8.6, 70, 20.6]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+        elif category == 1:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([0.9, 11.3, 67, 20.8]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+
+    elif bpCategory == "HYP_2":
+        if category == 5:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([0.5, 0.5, 69, 30]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+        elif category == 4:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([0.6, 3.2, 66, 30.2]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+        elif category == 3:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([0.7, 5.9, 63, 30.4]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+        elif category == 2:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([0.8, 8.6, 60, 30.6]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+        elif category == 1:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([0.9, 11.3, 57, 30.8]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+
+    elif bpCategory == "HYP_CR":
+        if category == 5:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([0.5, 0.5, 59, 40]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+        elif category == 4:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([0.6, 3.2, 55, 41.2]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+        elif category == 3:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([0.7, 5.9, 51, 42.4]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+        elif category == 2:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([0.8, 8.6, 47, 43.6]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+        elif category == 1:
+            pulseCategory = [1, 2, 3, 4]
+            weights = np.array([0.9, 11.3, 43, 44.8]) / 100.0
+            pulse_choice = np.random.choice(pulseCategory, 1, p=weights)[0]
+            [pulse_Choice_Value, next_temp] = getPulseValue(pulse_choice, pulse, maxLim_Pulse, temp)
+            return [pulse_Choice_Value, next_temp]
+
+
+def updatePulseTemp_User(user):
+    [user.pulse, user.temp] = updatePulse_BodyTemp(user.age, user.category, user.bpCategory, user.pulse, user.temp)
+
+
 def printUserDetails(user):
     """
     Function takes in a user object and print all its elements
@@ -246,6 +589,7 @@ def printUserDetails(user):
     value += "Blood Pressure: (" + str(user.bp[0]) + "," + str(user.bp[1]) + ")" + " mmHg" + " | "
     value += "Blood Pressure Category: " + user.bpCategory + " | "
     # value += "User Category: " + str(user.category) + " | "
+    value += "Pulse Rate: " + str(user.pulse) + " /min" + " | "
     value += "User ID: " + str(user.userID) + " | "
     value += "Device ID: " + str(user.deviceID) + " | "
     value += "Location: Lat: " + user.lat + ", Lon: " + user.lon + " | "
@@ -254,25 +598,65 @@ def printUserDetails(user):
     print value
     # return value
 
-def send_To_Kafka(user):
+
+def getUser_FITBIT(user):
+    value = str(user.deviceID) + ","
+    value += user.lat + ","
+    value += user.lon + ","
+    value += str(user.pulse) + ","
+    value += user.temp
+    return value
+
+
+def send_To_Kafka_User_Details(timestring, user):
     """
     Sends an user data to Kafka. Serves as the kafka-producer.
     :param user: usr.user object : user from the MUL
     :return: None
     """
-    producer_Topic_1 = 'python-test'
+    producer_Topic_1 = 'fitbit'
     producer = KafkaProducer(bootstrap_servers='localhost:9092')
-    message = printUserDetails(user)
+    # message = printUserDetails(user)
+    message = str(timestring) + "," + getUser_FITBIT(user)
     producer.send(producer_Topic_1, message)
     producer.flush()
 
-def send_Time_To_Kafka(time):
+
+def getUser_Details(user):
+    floatingPointFormatter = '{:7.3f}'
+    value = str(user.age) + ","
+    value += user.gender + ","
+    value += category.user_Category[user.category] + ","
+    value += floatingPointFormatter.format(user.weight) + ","
+    value += floatingPointFormatter.format(user.height) + ","
+    value += floatingPointFormatter.format(user.bmi) + ","
+    value += floatingPointFormatter.format(user.bfp) + ","
+    value += user.bpCategory + ","
+    value += str(user.bp[0]) + "," + str(user.bp[1]) + ","
+    value += str(user.userID) + ","
+    value += str(user.deviceID)
+    return value
+
+
+def send_To_Kafka_NewUser(user):
     """
     Sends the time to Kafka. Redundant at this point. Just for testing purpose being used.
     :param time: str(datetime): time from the simulation world
     :return: None
     """
-    producer_Topic_1 = 'python-test'
+    producer_Topic_1 = 'new-user-notification'
     producer = KafkaProducer(bootstrap_servers='localhost:9092')
-    producer.send(producer_Topic_1, time)
+    message = getUser_Details(user)
+    producer.send(producer_Topic_1, message)
     producer.flush()
+
+
+def send_To_Kafka_CountOfUsers(count):
+    producer_Topic_1 = 'user-list-length'
+    producer = KafkaProducer(bootstrap_servers='localhost:9092')
+    message = str(count)
+    producer.send(producer_Topic_1, message)
+    producer.flush()
+
+
+    # print np.std([1.0, 2.0])
