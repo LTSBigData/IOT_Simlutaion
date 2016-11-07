@@ -152,7 +152,7 @@ def get_Age_Limits(category):
     elif category == 2:
         return [18, 64]
     elif category == 3:
-        return [65, 100]
+        return [65, 70]
 
 # Pre-populating the master user list
 updateUserList(simulation_World_Time, n=50)

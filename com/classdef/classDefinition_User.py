@@ -24,7 +24,7 @@ class user(object):
         self.bmi = determine_BMI(self.weight, self.height)  # Body Mass Index
         self.bfp = determine_BFP(self.age, self.gender, self.bmi)  # Body Fat Percentage
         self.bp, self.bpCategory = determine_BP(self.age, category)  # Blood Pressure and its category
-        self.userID, self.deviceID = uuid.uuid1(), uuid.uuid4()  # Unique (User ID and Device ID)
+        self.userID, self.deviceID = uuid.uuid4(), uuid.uuid4()  # Unique (User ID and Device ID)
         [self.lat, self.lon, self.node_id, self.way_id] = glu.initialize_User_Position()  # Position of user
         self.pulse = initPulse(self.age)
         self.temp = initBodyTemp()
@@ -600,11 +600,13 @@ def printUserDetails(user):
 
 
 def getUser_FITBIT(user):
-    value = str(user.deviceID) + ","
+    value = str(user.userID) + ","
     value += user.lat + ","
     value += user.lon + ","
     value += str(user.pulse) + ","
-    value += user.temp
+    value += user.temp + ","
+    value += str(user.age) + ","
+    value += user.bpCategory
     return value
 
 
@@ -617,7 +619,7 @@ def send_To_Kafka_User_Details(timestring, user):
     producer_Topic_1 = 'fitbit'
     producer = KafkaProducer(bootstrap_servers='localhost:9092')
     # message = printUserDetails(user)
-    message = str(timestring) + "," + getUser_FITBIT(user)
+    message = producer_Topic_1 + "," + str(timestring) + "," + getUser_FITBIT(user)
     producer.send(producer_Topic_1, message)
     producer.flush()
 
@@ -641,12 +643,11 @@ def getUser_Details(user):
 def send_To_Kafka_NewUser(user):
     """
     Sends the time to Kafka. Redundant at this point. Just for testing purpose being used.
-    :param time: str(datetime): time from the simulation world
     :return: None
     """
     producer_Topic_1 = 'new-user-notification'
     producer = KafkaProducer(bootstrap_servers='localhost:9092')
-    message = getUser_Details(user)
+    message = producer_Topic_1 + "," + getUser_Details(user)
     producer.send(producer_Topic_1, message)
     producer.flush()
 
