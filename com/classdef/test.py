@@ -176,7 +176,10 @@ while(total_hours != 0):
     print "Time in Simulation" + str(simulation_World_Time)
     # print dt.datetime.now()
     # usr.send_Time_To_Kafka(str(simulation_World_Time))
-    weights = numpy.array([50, 50]) / 100.0
+    # weights = numpy.array([50, 50]) / 100.0
+    p = random.uniform(0.0, 0.3)
+    q = 1.0 - p
+    weights = numpy.array([p, q])
     choices = [0, 1]
     choice = numpy.random.choice(choices, 1, p=weights)
     if choice == 1:

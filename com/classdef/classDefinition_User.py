@@ -1,5 +1,6 @@
 import math
 import random as rn
+import time
 import uuid
 
 import numpy as np
@@ -616,10 +617,12 @@ def send_To_Kafka_User_Details(timestring, user):
     :param user: usr.user object : user from the MUL
     :return: None
     """
+    stringFormatter = '{:13.0f}'
     producer_Topic_1 = 'fitbit'
     producer = KafkaProducer(bootstrap_servers='localhost:9092')
     # message = printUserDetails(user)
-    message = producer_Topic_1 + "," + str(timestring) + "," + getUser_FITBIT(user)
+    message = producer_Topic_1 + "," + str(timestring) + "," + getUser_FITBIT(user) + "," + stringFormatter.format(
+        time.time() * 1000)
     producer.send(producer_Topic_1, message)
     producer.flush()
 
