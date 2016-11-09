@@ -20,7 +20,7 @@ master_User_List = []
 # This will server as the total number of users for the while loop
 print MUL + "Initialized with size = " + str(len(master_User_List))
 count = len(master_User_List)
-usr.send_To_Kafka_CountOfUsers(count)
+usr.send_To_Kafka_CountOfUsers(count, midnight_time.date())
 
 # Initiate the simulation world time with today's date at 00:00:00 hrs
 simulation_World_Time = midnight_time
@@ -40,14 +40,14 @@ def updateUserList(time_1, n=1):
             age, gender = assign_Age_Gender()
             add_User_To_List(age, gender, simulation_World_Time=time_1)
             count = len(master_User_List)
-            usr.send_To_Kafka_CountOfUsers(count)
+            usr.send_To_Kafka_CountOfUsers(count, time_1.date())
         return None
 
     # adding n = 1 users to MUL
     age, gender = assign_Age_Gender()
     add_User_To_List(age, gender, simulation_World_Time=time_1)
     count = len(master_User_List)
-    usr.send_To_Kafka_CountOfUsers(count)
+    usr.send_To_Kafka_CountOfUsers(count, time_1.date())
 
 
 def add_User_To_List(age, gender, simulation_World_Time):
@@ -168,18 +168,27 @@ print MUL + "Pre-populated with :" + str(len(master_User_List)) + " users"
 # print MUL + "Total users : " + str(master_User_List_Length)
 
 # total_hours keeps a measure of the time in the simulation.
-total_hours = 12
-
+total_hours = 100
+count_Sales_Current = 0
+count_Sales_Previous = 0
+hour_count = 1
 print dt.datetime.now()
 
 while(total_hours != 0):
     print "Time in Simulation" + str(simulation_World_Time)
     # print dt.datetime.now()
     # usr.send_Time_To_Kafka(str(simulation_World_Time))
-    # weights = numpy.array([50, 50]) / 100.0
-    p = random.uniform(0.0, 0.3)
-    q = 1.0 - p
-    weights = numpy.array([p, q])
+    weights = numpy.array([95, 5]) / 100.0
+    # p = random.uniform(0.0, 0.3)
+    # q = 1.0 - p
+    # weights = numpy.array([p, q])
+
+    if hour_count % 24 == 0:
+        hour_count = 0
+        count_Sales_Current = len(master_User_List) - count_Sales_Previous
+        usr.send_To_Kafka_Sales(simulation_World_Time.date(), count_Sales_Current)
+        count_Sales_Previous = len(master_User_List)
+
     choices = [0, 1]
     choice = numpy.random.choice(choices, 1, p=weights)
     if choice == 1:
@@ -188,6 +197,7 @@ while(total_hours != 0):
         print "New User Added!!"
         continue
     else:
+        hour_count += 1
         for i in range(len(master_User_List)):
             glu.updateLocation_User(master_User_List[i])
             usr.updatePulseTemp_User(master_User_List[i])
