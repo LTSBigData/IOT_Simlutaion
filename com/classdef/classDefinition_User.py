@@ -658,7 +658,7 @@ def send_To_Kafka_NewUser(user):
 def send_To_Kafka_CountOfUsers(count, timestring):
     producer_Topic_1 = 'user-list-length'
     producer = KafkaProducer(bootstrap_servers='localhost:9092')
-    message = producer_Topic_1 + "," + str(count) + "," + str(timestring)
+    message = str(count)
     producer.send(producer_Topic_1, message)
     producer.flush()
 
