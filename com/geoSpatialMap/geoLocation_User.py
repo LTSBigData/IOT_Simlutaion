@@ -2,9 +2,9 @@ import linecache as ln
 import random as rn
 
 # These are constant paths that will be used for the geo-location for the users
-NODE_COORD_PATH = 'D:/Users/rajsarka/Documents/FITSIM/resources/node_Coordinates'
-WAY_NODE_PATH = 'D:/Users/rajsarka/Documents/FITSIM/resources/way_Node_Map'
-NODE_WAY_PATH = 'D:/Users/rajsarka/Documents/FITSIM/resources/node_Way_Map'
+NODE_COORD_PATH = './resources/node_Coordinates'
+WAY_NODE_PATH = './resources/way_Node_Map'
+NODE_WAY_PATH = './resources/node_Way_Map'
 
 node_coord = ln.getlines(NODE_COORD_PATH)
 way_node_map = ln.getlines(WAY_NODE_PATH)

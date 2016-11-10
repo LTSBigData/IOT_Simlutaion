@@ -611,6 +611,12 @@ def getUser_FITBIT(user):
     return value
 
 
+def getHost(value=0):
+    if value == 1:
+        return 'localhost:9092'
+    else:
+        return 'DIN16000309:9092'  # Enter any other host server id here
+
 def send_To_Kafka_User_Details(timestring, user):
     """
     Sends an user data to Kafka. Serves as the kafka-producer.
@@ -656,9 +662,10 @@ def send_To_Kafka_NewUser(user):
 
 
 def send_To_Kafka_CountOfUsers(count, timestring):
+    stringFormatter = '{:13.0f}'
     producer_Topic_1 = 'user-list-length'
     producer = KafkaProducer(bootstrap_servers='localhost:9092')
-    message = str(count)
+    message = "(" + str(1) + "," + stringFormatter.format(time.time() * 1000) + ")"
     producer.send(producer_Topic_1, message)
     producer.flush()
 

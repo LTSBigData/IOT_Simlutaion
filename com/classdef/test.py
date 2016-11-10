@@ -155,7 +155,7 @@ def get_Age_Limits(category):
         return [65, 70]
 
 # Pre-populating the master user list
-updateUserList(simulation_World_Time, n=50)
+updateUserList(simulation_World_Time, n=5)
 
 print MUL + "Pre-populated with :" + str(len(master_User_List)) + " users"
 
@@ -168,7 +168,7 @@ print MUL + "Pre-populated with :" + str(len(master_User_List)) + " users"
 # print MUL + "Total users : " + str(master_User_List_Length)
 
 # total_hours keeps a measure of the time in the simulation.
-total_hours = 100
+total_hours = 1000
 count_Sales_Current = 0
 count_Sales_Previous = 0
 hour_count = 1
@@ -178,7 +178,7 @@ while(total_hours != 0):
     print "Time in Simulation" + str(simulation_World_Time)
     # print dt.datetime.now()
     # usr.send_Time_To_Kafka(str(simulation_World_Time))
-    weights = numpy.array([95, 5]) / 100.0
+    weights = numpy.array([60, 40]) / 100.0
     # p = random.uniform(0.0, 0.3)
     # q = 1.0 - p
     # weights = numpy.array([p, q])
