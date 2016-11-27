@@ -15,6 +15,7 @@ MAX_PULSE_BELOW40 = 220
 MAX_PULSE_ABOVE40 = 208
 ABOVE_40_CONST = 0.75
 
+
 class user(object):
     def __init__(self, age, gender, category, sleep_count, initiation_Time):
         self.age = age  # User age
@@ -63,10 +64,10 @@ def determine_Height_And_Weight(age, gender):
         elif gender == "F":
             height = rn.uniform(158.1, 164.8)
             weight = rn.uniform(149, 166)
-            return [weight,height]
+            return [weight, height]
 
 
-def determine_BMI(weight,height):
+def determine_BMI(weight, height):
     """
     Function returns the BMI (Body Mass Index) of the user given weight and height.
     The function incorporates all the conversions required to calculate BMI from lbs and cms.
@@ -74,7 +75,7 @@ def determine_BMI(weight,height):
     :param height: float : height of user (in cms)
     :return: float : bmi of user
     """
-    bmi = float((weight * 703)/ math.pow((height * 0.393701 ), 2))
+    bmi = float((weight * 703) / math.pow((height * 0.393701), 2))
     return bmi
 
 
@@ -89,14 +90,14 @@ def determine_BFP(age, gender, bmi):
     """
     if age <= 16:
         if gender == "M":
-            bfp = (1.51 * bmi) - (0.70 * age) - (3.6) + 1.4
+            bfp = (1.51 * bmi) - (0.70 * age) - 3.6 + 1.4
             return bfp
         elif gender == "F":
             bfp = (1.51 * bmi) - (0.70 * age) + 1.4
             return bfp
     elif age > 16:
         if gender == "M":
-            bfp = (1.20 * bmi) + (0.23 * age) - (10.8) - 5.4
+            bfp = (1.20 * bmi) + (0.23 * age) - 10.8 - 5.4
             return bfp
         elif gender == "F":
             bfp = (1.20 * bmi) + (0.23 * age) - 5.4
@@ -123,10 +124,9 @@ def determine_BP(age, activityFlag):
     :param activityFlag: int : flag (1 to 5) mapping activity level of user
     :return: List : [[float : Systolic Pressure, float: Diastolic Pressure], str: Blood Pressure Category]
     """
-    if activityFlag == 5: # for VeryActive Users
+    if activityFlag == 5:  # for VeryActive Users
         # respective weights of the blood pressure categories
-        bpWts = np.array([7, 80, 7, 4, 1, 1])
-        bpWts = bpWts/100.0
+        bpWts = np.array([7, 80, 7, 4, 1, 1]) / 100.0
         # blood pressure categories
         bpChoices = ["LOW", "NORMAL", "PREHYP", "HYP_1", "HYP_2", "HYP_CR"]
         # choice is a numpy array element containing 1 single string value in its 0th element.
@@ -136,8 +136,7 @@ def determine_BP(age, activityFlag):
 
     elif activityFlag == 4:  # for ModeratelyActive Users
         # respective weights of the blood pressure categories
-        bpWts = np.array([10, 65, 10, 8, 6, 1])
-        bpWts = bpWts/100.0
+        bpWts = np.array([10, 65, 10, 8, 6, 1]) / 100.0
         # blood pressure categories
         bpChoices = ["LOW", "NORMAL", "PREHYP", "HYP_1", "HYP_2", "HYP_CR"]
         # choice is a numpy array element containing 1 single string value in its 0th element.
@@ -147,8 +146,7 @@ def determine_BP(age, activityFlag):
 
     elif activityFlag == 3:  # for LightlyActive Users
         # respective weights of the blood pressure categories
-        bpWts = np.array([15, 50, 12, 10, 9, 4])
-        bpWts = bpWts/100.0
+        bpWts = np.array([15, 50, 12, 10, 9, 4]) / 100.0
         # blood pressure categories
         bpChoices = ["LOW", "NORMAL", "PREHYP", "HYP_1", "HYP_2", "HYP_CR"]
         # choice is a numpy array element containing 1 single string value in its 0th element.
@@ -158,8 +156,7 @@ def determine_BP(age, activityFlag):
 
     elif activityFlag == 2:  # for Sedentary Users
         # respective weights of the blood pressure categories
-        bpWts = np.array([20, 40, 15, 12, 10, 3])
-        bpWts = bpWts/100.0
+        bpWts = np.array([20, 40, 15, 12, 10, 3]) / 100.0
         # blood pressure categories
         bpChoices = ["LOW", "NORMAL", "PREHYP", "HYP_1", "HYP_2", "HYP_CR"]
         # choice is a numpy array element containing 1 single string value in its 0th element.
@@ -169,8 +166,7 @@ def determine_BP(age, activityFlag):
 
     elif activityFlag == 1:  # for NoActive Users
         # respective weights of the blood pressure categories
-        bpWts = np.array([25, 20, 20, 18, 10, 7])
-        bpWts = bpWts/100.0
+        bpWts = np.array([25, 20, 20, 18, 10, 7]) / 100.0
         # blood pressure categories
         bpChoices = ["LOW", "NORMAL", "PREHYP", "HYP_1", "HYP_2", "HYP_CR"]
         # choice is a numpy array element containing 1 single string value in its 0th element.
@@ -211,10 +207,10 @@ def returnBP_Value(bpChoice, age):
         [sysLow, sysUp, diasLow, diasUp] = bp.bp_Limit_Map[bpChoice]
         # The correlation values are calculated for both the diastolic and systolic pressure
         [sys_Corr_Low, sys_Corr_Up] = [((sysLow - normalSystolic) / float(age)),
-                                         ((sysUp - normalSystolic) / float(age))]
+                                       ((sysUp - normalSystolic) / float(age))]
 
-        [dias_Corr_Low, dias_Corr_Up] = [((diasLow - normalDiastolic)/float(age)),
-                                         ((diasUp - normalDiastolic)/float(age))]
+        [dias_Corr_Low, dias_Corr_Up] = [((diasLow - normalDiastolic) / float(age)),
+                                         ((diasUp - normalDiastolic) / float(age))]
         # A random floating point value is chosen between the range for both Systolic and Diastolic Pressure
         sys_Corr_Final = rn.uniform(sys_Corr_Low, sys_Corr_Up)
         dias_Corr_Final = rn.uniform(dias_Corr_Low, dias_Corr_Up)
@@ -227,10 +223,10 @@ def returnBP_Value(bpChoice, age):
         [sysLow, sysUp, diasLow, diasUp] = bp.bp_Limit_Map[bpChoice]
         # The correlation values are calculated for both the diastolic and systolic pressure
         [sys_Corr_Low, sys_Corr_Up] = [((sysLow - normalSystolic) / float(age)),
-                                         ((sysUp - normalSystolic) / float(age))]
+                                       ((sysUp - normalSystolic) / float(age))]
 
-        [dias_Corr_Low, dias_Corr_Up] = [((diasLow - normalDiastolic)/float(age)),
-                                         ((diasUp - normalDiastolic)/float(age))]
+        [dias_Corr_Low, dias_Corr_Up] = [((diasLow - normalDiastolic) / float(age)),
+                                         ((diasUp - normalDiastolic) / float(age))]
         # A random floating point value is chosen between the range for both Systolic and Diastolic Pressure
         sys_Corr_Final = rn.uniform(sys_Corr_Low, sys_Corr_Up)
         dias_Corr_Final = rn.uniform(dias_Corr_Low, dias_Corr_Up)
@@ -240,7 +236,7 @@ def returnBP_Value(bpChoice, age):
 
 
 def getPulseTargetLimit(age, MAXPULSE_Limit=False):
-    if MAXPULSE_Limit == False:
+    if not MAXPULSE_Limit:
         if age <= 40:
             value = MAX_PULSE_BELOW40 - age
             targetLow = math.ceil(value * 0.50)
@@ -251,7 +247,7 @@ def getPulseTargetLimit(age, MAXPULSE_Limit=False):
             targetLow = math.ceil(value * 0.50)
             targetHigh = math.ceil(value * 0.85)
             return [targetLow, targetHigh]
-    elif MAXPULSE_Limit == True:
+    elif MAXPULSE_Limit:
         if age <= 40:
             value = MAX_PULSE_BELOW40 - age
             targetLow = math.ceil(value * 0.50)
@@ -292,12 +288,13 @@ def getNextTemp():
 
 
 def getStdDev_WRT_Temp(a, b, temp):
-    '''
+    """
     Returns either sigma or -sigma of 2 numbers.
     :param a: float: Number 1
     :param b: float: Number 2
+    :param temp: float: current temperature
     :return: float: sigma or -sigma
-    '''
+    """
     choice = 0
     tempFormatter = '{:4.2f}'
     current_temp = temp
@@ -308,7 +305,7 @@ def getStdDev_WRT_Temp(a, b, temp):
         choice = 1.0
     elif current_temp > next_temp:
         choice = -1.0
-    stdDev = np.std([float(a), float(b)])
+    stdDev = np.std([float(a), float(b)]) / 100.0
     value = stdDev * choice
     return [value, next_temp]
 
@@ -344,21 +341,21 @@ def getPulseValue(pulse_Choice, currentPulse, maxLim_Pulse, temp):
 
 
 def initPulse(age):
-    '''
+    """
     When user is instantiated, it assigns a normal pulse rate.
     :param age: int: Age of user
     :return value: float: Initial pulse rate of user
-    '''
+    """
     [targetLow, targetHigh] = getPulseTargetLimit(age)
     value = math.ceil(rn.uniform(targetLow, targetHigh))
     return value
 
 
 def initBodyTemp():
-    '''
+    """
     Assigns a normal body temperature when an user instantiates
     :return: str: body temperature in celsius
-    '''
+    """
     tempFormatter = '{:4.2f}'
     lower_limit = 36.5
     upper_limit = 37.5
@@ -367,14 +364,15 @@ def initBodyTemp():
 
 
 def updatePulse_BodyTemp(age, category, bpCategory, pulse, temp):
-    '''
+    """
     Returns a pulse rate value of the user.
     :param age: int: Age of user
     :param category: int: Activity Category of user. Ranges from 5 to 1. 5 being most active.
     :param bpCategory: str: Blood Pressure category of the user. Consists of 6 categories.
     :param pulse: float: Current Pulse Rate of the user.
+    :param temp: float: Current temperature of the user.
     :return: float: next pulse rate value
-    '''
+    """
     # Taking only the maximum pulse of that age. It is 3rd element of the returned list
     maxLim_Pulse = getPulseTargetLimit(age, MAXPULSE_Limit=True)[2]
     if bpCategory == "LOW":
@@ -574,30 +572,30 @@ def updatePulseTemp_User(user):
     [user.pulse, user.temp] = updatePulse_BodyTemp(user.age, user.category, user.bpCategory, user.pulse, user.temp)
 
 
-def printUserDetails(user):
-    """
-    Function takes in a user object and print all its elements
-    :param user: user object
-    :return: None
-    """
-    floatingPointFormatter = '{:7.3f}'
-    value = "Age: " + str(user.age)+ " yrs"  + " | "
-    value += "Gender: " + user.gender + " | "
-    value += "Weight: " + floatingPointFormatter.format(user.weight) + " lbs" + " | "
-    value += "Height: " + floatingPointFormatter.format(user.height) + " cm" +" | "
-    value += " BMI: " + floatingPointFormatter.format(user.bmi) + " | "
-    value += "BFP: " + floatingPointFormatter.format(user.bfp) + "%" + " | "
-    value += "Blood Pressure: (" + str(user.bp[0]) + "," + str(user.bp[1]) + ")" + " mmHg" + " | "
-    value += "Blood Pressure Category: " + user.bpCategory + " | "
-    # value += "User Category: " + str(user.category) + " | "
-    value += "Pulse Rate: " + str(user.pulse) + " /min" + " | "
-    value += "User ID: " + str(user.userID) + " | "
-    value += "Device ID: " + str(user.deviceID) + " | "
-    value += "Location: Lat: " + user.lat + ", Lon: " + user.lon + " | "
-    value += "Current NodeID: " + user.node_id + " | "
-    value += "Current WayID: " + user.way_id
-    print value
-    # return value
+# def printUserDetails(user):
+#     """
+#     Function takes in a user object and print all its elements
+#     :param user: user object
+#     :return: None
+#     """
+#     floatingPointFormatter = '{:7.3f}'
+#     value = "Age: " + str(user.age) + " yrs" + " | "
+#     value += "Gender: " + user.gender + " | "
+#     value += "Weight: " + floatingPointFormatter.format(user.weight) + " lbs" + " | "
+#     value += "Height: " + floatingPointFormatter.format(user.height) + " cm" + " | "
+#     value += " BMI: " + floatingPointFormatter.format(user.bmi) + " | "
+#     value += "BFP: " + floatingPointFormatter.format(user.bfp) + "%" + " | "
+#     value += "Blood Pressure: (" + str(user.bp[0]) + "," + str(user.bp[1]) + ")" + " mmHg" + " | "
+#     value += "Blood Pressure Category: " + user.bpCategory + " | "
+#     # value += "User Category: " + str(user.category) + " | "
+#     value += "Pulse Rate: " + str(user.pulse) + " /min" + " | "
+#     value += "User ID: " + str(user.userID) + " | "
+#     value += "Device ID: " + str(user.deviceID) + " | "
+#     value += "Location: Lat: " + user.lat + ", Lon: " + user.lon + " | "
+#     value += "Current NodeID: " + user.node_id + " | "
+#     value += "Current WayID: " + user.way_id
+#     print value
+#     # return value
 
 
 def getUser_FITBIT(user):
@@ -616,6 +614,7 @@ def getHost(value=0):
         return 'localhost:9092'
     else:
         return 'DIN16000309:9092'  # Enter any other host server id here
+
 
 def send_To_Kafka_User_Details(timestring, user):
     """

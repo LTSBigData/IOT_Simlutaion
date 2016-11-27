@@ -178,7 +178,7 @@ while(total_hours != 0):
     print "Time in Simulation" + str(simulation_World_Time)
     # print dt.datetime.now()
     # usr.send_Time_To_Kafka(str(simulation_World_Time))
-    weights = numpy.array([60, 40]) / 100.0
+    weights = numpy.array([80, 20]) / 100.0
     # p = random.uniform(0.0, 0.3)
     # q = 1.0 - p
     # weights = numpy.array([p, q])
