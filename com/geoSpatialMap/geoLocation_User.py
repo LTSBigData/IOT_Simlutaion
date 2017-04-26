@@ -1,19 +1,28 @@
 import linecache as ln
+import os
 import random as rn
+from os import path
+
+project_dir = path.dirname(path.dirname(os.getcwd()))
 
 # These are constant paths that will be used for the geo-location for the users
-NODE_COORD_PATH = './resources/node_Coordinates'
-WAY_NODE_PATH = './resources/way_Node_Map'
-NODE_WAY_PATH = './resources/node_Way_Map'
+NODE_COORD_PATH = project_dir + '/resources/node_Coordinates'
+WAY_NODE_PATH = project_dir + '/resources/way_Node_Map'
+NODE_WAY_PATH = project_dir + '/resources/node_Way_Map'
 
+# Creating dictionaries for the ease of indexing
 node_coord = ln.getlines(NODE_COORD_PATH)
+node_coord = {int(node_coord[i].strip().split(",")[0]): node_coord[i].strip().split(",")[1:]
+              for i in range(len(node_coord))}
+
 way_node_map = ln.getlines(WAY_NODE_PATH)
+way_node_map = {int(way_node_map[i].strip().split(",")[0]): map(int, way_node_map[i].strip().split(",")[1:])
+                for i in range(len(way_node_map))}
+
 node_way_map = ln.getlines(NODE_WAY_PATH)
+node_way_map = {int(node_way_map[i].strip().split(",")[0]): map(int, node_way_map[i].strip().split(",")[1:])
+                for i in range(len(node_way_map))}
 
-
-# print len(node_coord)
-# print len(way_node_map)
-# print len(node_way_map)
 
 def updateSleepCount(sleep_count, category=None):
     '''
@@ -43,33 +52,10 @@ def updateSleepCount(sleep_count, category=None):
 def obtainCoordinates(node_id):
     '''
     Returns latitude and longitude for given node_id
-    :param node_id: str: node_id
+    :param node_id: int: node_id
     :return: list[str: lat, str: lon]
     '''
-    for line in node_coord:
-        lineList = line.strip().split(",")
-        if lineList[0] == node_id:
-            lat = lineList[1]
-            lon = lineList[2]
-            return [lat, lon]
-        else:
-            continue
-
-
-def obtainNodeId(lat, lon):
-    '''
-    Returns node_id given lat and lon. NOTE: Not used yet.
-    :param lat: str: latitude
-    :param lon: str: longitude
-    :return: str: node_id
-    '''
-    for line in node_coord:
-        lineList = line.strip().split(",")
-        if lineList[1] == lat and lineList[2] == lon:
-            node_id = lineList[0]
-            return node_id
-        else:
-            continue
+    return node_coord[node_id]
 
 
 def obtain_Next_Way(node_id, way_id=None):
@@ -80,15 +66,7 @@ def obtain_Next_Way(node_id, way_id=None):
     :param way_id: str: OPTIONAL.
     :return: str: way_id
     '''
-    # way_id = None since that allows selection of the same way_id possible.
-    wayList = []
-    for line in node_way_map:
-        if line.strip().split(",")[0] == node_id:
-            # [1:] is done since the first --> [0]th element is the way_id
-            wayList = line.strip().split(",")[1:]
-            break
-        else:
-            continue
+    wayList = node_way_map[node_id]
     way_choice = wayList[rn.randint(0, len(wayList) - 1)]
 
     # # In case we don't want to choose the same way
@@ -102,19 +80,11 @@ def obtain_Next_Node(way_id, node_id):
     '''
     Given a way_id AND node_id, it selects another node_id adjacent to the index of the given one.
     End-element exception is taken care of.
-    :param way_id: str: way_id
-    :param node_id: str: node_id
-    :return: str: node_id
+    :param way_id: int: way_id
+    :param node_id: int: node_id
+    :return: int: node_id
     '''
-    nodeList = []
-    for line in way_node_map:
-        if line.strip().split(",")[0] == way_id:
-            # [1:] is done since the first --> [0]th element is the node_id
-            nodeList = line.strip().split(",")[1:]
-            break
-        else:
-            continue
-
+    nodeList = way_node_map[way_id]
     nodeListLength = len(nodeList)
     # index() methods gives the index of an element in a list. It ranges from 0 to (len(list) - 1)
     node_id_index = nodeList.index(node_id)
@@ -127,7 +97,7 @@ def obtain_Next_Node(way_id, node_id):
         nextNode = nodeList[node_id_index - 1]
         return nextNode
     else:
-        choice = rn.choice([1, -1])
+        choice = rn.choice([1, -1])  # 1 or -1 makes sure that only a single 'step' is taken
         nextNode = nodeList[node_id_index + choice]
         return nextNode
 
@@ -137,20 +107,21 @@ def initialize_User_Position():
     Initializes a user with on a specific node_id, way_id, lat and lon. Choice is made at random.
     :return: None
     '''
-    # This gives a line number corresponding to one of the way id's
-    choice_of_way = rn.randint(1, len(way_node_map))  # Starts at 1 since ln.getline() starts from 1
-    # Get the line and strip 'n' split to obtain way_id and node_id's
-    way_id_list = ln.getline(WAY_NODE_PATH, choice_of_way).strip().split(",")
-    way_id = way_id_list[0]
+    # Choose a random 'way_id' to start from
+    choice_of_way = rn.choice(way_node_map.keys())
+    # Obtain the 'node_id's for 'way_id'
+    way_id_list = way_node_map[choice_of_way]
+
     # Choose a random node within the list specific to the chosen way_id
-    if len(way_id_list) == 3:  # In case there are only 2 possible node_id's corresponding to the way_id
-        chosen_node_toBegin = way_id_list[rn.choice([1, 2])]
+
+    if len(way_id_list) == 1:  # In case there is only 1 possible node_id corresponding to the way_id
+        chosen_node_toBegin = way_id_list[0]
         [lat, lon] = obtainCoordinates(chosen_node_toBegin)
     else:
-        chosen_node_toBegin = way_id_list[rn.randint(1, len(way_id_list) - 1)]  # Begin at 1 since [0] is way_id
+        chosen_node_toBegin = way_id_list[rn.randint(0, len(way_id_list) - 1)]  # len() - 1 --> since it is inclusive
         [lat, lon] = obtainCoordinates(chosen_node_toBegin)
 
-    return [lat, lon, chosen_node_toBegin, way_id]
+    return [lat, lon, chosen_node_toBegin, choice_of_way]
 
 
 def updateLocation_User(user):

@@ -1,10 +1,9 @@
 import math
 import random as rn
-import time
 import uuid
+from os import path
 
 import numpy as np
-from kafka import KafkaProducer
 
 import com.geoSpatialMap.geoLocation_User as glu
 import com.map.age_Weight_Heigt_Map_Kids as wt_ht_map
@@ -16,8 +15,21 @@ MAX_PULSE_ABOVE40 = 208
 ABOVE_40_CONST = 0.75
 
 
+def fileInitiate(_path):
+    if path.exists(_path):
+        file_attribute = 'a'
+        return open(_path, file_attribute)
+    else:
+        file_attribute = 'w'
+        return open(_path, file_attribute)
+
+
+# f[0] -> file writer to user_history
+# f[1] -> file writer to user_register
+
+
 class user(object):
-    def __init__(self, age, gender, category, sleep_count, initiation_Time):
+    def __init__(self, age, gender, category, sleep_count, initiation_Time, user_register_file, user_history_file):
         self.age = age  # User age
         self.gender = gender  # User Gender
         self.sleep_count = sleep_count  # measure of rate of update of geo-location
@@ -26,12 +38,16 @@ class user(object):
         self.bmi = determine_BMI(self.weight, self.height)  # Body Mass Index
         self.bfp = determine_BFP(self.age, self.gender, self.bmi)  # Body Fat Percentage
         self.bp, self.bpCategory = determine_BP(self.age, category)  # Blood Pressure and its category
-        self.userID, self.deviceID = uuid.uuid4(), uuid.uuid4()  # Unique (User ID and Device ID)
+
+        # self.userID, self.deviceID = uuid.uuid4(), uuid.uuid4()  # Optional Device ID can be initiated if user has multiple devices
+        # for the time being not used
+
+        self.userID = uuid.uuid4()  # Unique (User ID and Device ID)
         [self.lat, self.lon, self.node_id, self.way_id] = glu.initialize_User_Position()  # Position of user
         self.pulse = initPulse(self.age)
         self.temp = initBodyTemp()
-        send_To_Kafka_NewUser(self)
-        send_To_Kafka_User_Details(initiation_Time, self)
+        userRegistration(self, user_register_file)
+        user_current_data(initiation_Time, self, user_history_file)
 
 
 def determine_Height_And_Weight(age, gender):
@@ -572,30 +588,30 @@ def updatePulseTemp_User(user):
     [user.pulse, user.temp] = updatePulse_BodyTemp(user.age, user.category, user.bpCategory, user.pulse, user.temp)
 
 
-# def printUserDetails(user):
-#     """
-#     Function takes in a user object and print all its elements
-#     :param user: user object
-#     :return: None
-#     """
-#     floatingPointFormatter = '{:7.3f}'
-#     value = "Age: " + str(user.age) + " yrs" + " | "
-#     value += "Gender: " + user.gender + " | "
-#     value += "Weight: " + floatingPointFormatter.format(user.weight) + " lbs" + " | "
-#     value += "Height: " + floatingPointFormatter.format(user.height) + " cm" + " | "
-#     value += " BMI: " + floatingPointFormatter.format(user.bmi) + " | "
-#     value += "BFP: " + floatingPointFormatter.format(user.bfp) + "%" + " | "
-#     value += "Blood Pressure: (" + str(user.bp[0]) + "," + str(user.bp[1]) + ")" + " mmHg" + " | "
-#     value += "Blood Pressure Category: " + user.bpCategory + " | "
-#     # value += "User Category: " + str(user.category) + " | "
-#     value += "Pulse Rate: " + str(user.pulse) + " /min" + " | "
-#     value += "User ID: " + str(user.userID) + " | "
-#     value += "Device ID: " + str(user.deviceID) + " | "
-#     value += "Location: Lat: " + user.lat + ", Lon: " + user.lon + " | "
-#     value += "Current NodeID: " + user.node_id + " | "
-#     value += "Current WayID: " + user.way_id
-#     print value
-#     # return value
+def printUserDetails(user):
+    """
+    Function takes in a user object and print all its elements
+    :param user: user object
+    :return: None
+    """
+    floatingPointFormatter = '{:7.3f}'
+    value = "Age: " + str(user.age) + " yrs" + " | "
+    value += "Gender: " + user.gender + " | "
+    value += "Weight: " + floatingPointFormatter.format(user.weight) + " lbs" + " | "
+    value += "Height: " + floatingPointFormatter.format(user.height) + " cm" + " | "
+    value += " BMI: " + floatingPointFormatter.format(user.bmi) + " | "
+    value += "BFP: " + floatingPointFormatter.format(user.bfp) + "%" + " | "
+    value += "Blood Pressure: (" + str(user.bp[0]) + "," + str(user.bp[1]) + ")" + " mmHg" + " | "
+    value += "Blood Pressure Category: " + user.bpCategory + " | "
+    # value += "User Category: " + str(user.category) + " | "
+    value += "Pulse Rate: " + str(user.pulse) + " /min" + " | "
+    value += "User ID: " + str(user.userID) + " | "
+    value += "Device ID: " + str(user.deviceID) + " | "
+    value += "Location: Lat: " + user.lat + ", Lon: " + user.lon + " | "
+    value += "Current NodeID: " + user.node_id + " | "
+    value += "Current WayID: " + user.way_id
+    print value
+    # return value
 
 
 def getUser_FITBIT(user):
@@ -606,30 +622,13 @@ def getUser_FITBIT(user):
     value += user.temp + ","
     value += str(user.age) + ","
     value += user.bpCategory
+    # print value
     return value
 
 
-def getHost(value=0):
-    if value == 1:
-        return 'localhost:9092'
-    else:
-        return 'DIN16000309:9092'  # Enter any other host server id here
-
-
-def send_To_Kafka_User_Details(timestring, user):
-    """
-    Sends an user data to Kafka. Serves as the kafka-producer.
-    :param user: usr.user object : user from the MUL
-    :return: None
-    """
-    stringFormatter = '{:13.0f}'
-    producer_Topic_1 = 'fitbit'
-    producer = KafkaProducer(bootstrap_servers='localhost:9092')
-    # message = printUserDetails(user)
-    message = producer_Topic_1 + "," + str(timestring) + "," + getUser_FITBIT(user) + "," + stringFormatter.format(
-        time.time() * 1000)
-    producer.send(producer_Topic_1, message)
-    producer.flush()
+def user_current_data(timestring, user, file):
+    message = str(timestring) + "," + getUser_FITBIT(user) + '\n'
+    file.write(message)
 
 
 def getUser_Details(user):
@@ -643,37 +642,16 @@ def getUser_Details(user):
     value += floatingPointFormatter.format(user.bfp) + ","
     value += user.bpCategory + ","
     value += str(user.bp[0]) + "," + str(user.bp[1]) + ","
-    value += str(user.userID) + ","
-    value += str(user.deviceID)
+    value += str(user.userID)  # + ","
+    # print value
     return value
 
 
-def send_To_Kafka_NewUser(user):
+def userRegistration(user, file):
     """
-    Sends the time to Kafka. Redundant at this point. Just for testing purpose being used.
-    :return: None
+    Registers any new user with user details and writes into file
+    :param user: 
+    :return: 
     """
-    producer_Topic_1 = 'new-user-notification'
-    producer = KafkaProducer(bootstrap_servers='localhost:9092')
-    message = producer_Topic_1 + "," + getUser_Details(user)
-    producer.send(producer_Topic_1, message)
-    producer.flush()
-
-
-def send_To_Kafka_CountOfUsers(count, timestring):
-    stringFormatter = '{:13.0f}'
-    producer_Topic_1 = 'user-list-length'
-    producer = KafkaProducer(bootstrap_servers='localhost:9092')
-    message = "(" + str(1) + "," + stringFormatter.format(time.time() * 1000) + ")"
-    producer.send(producer_Topic_1, message)
-    producer.flush()
-
-
-def send_To_Kafka_Sales(date, count):
-    producer_Topic_1 = 'sales'
-    producer = KafkaProducer(bootstrap_servers='localhost:9092')
-    message = producer_Topic_1 + "," + str(date) + "," + str(count)
-    producer.send(producer_Topic_1, message)
-    producer.flush()
-
-    # print np.std([1.0, 2.0])
+    message = getUser_Details(user) + '\n'
+    file.write(message)

@@ -4,7 +4,7 @@ from datetime import time
 
 import numpy
 
-import classDefinition_User as usr
+import classDefinition_User_cluster as usr
 import com.geoSpatialMap.geoLocation_User as glu
 
 MUL = "*** MASTER USER LIST *** "
