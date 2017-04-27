@@ -1,0 +1,6 @@
+http://jswhit.github.io/pyproj/
+https://github.com/jswhit/pyproj
+https://github.com/matplotlib/basemap/issues/285
+https://pythonhosted.org/Python%20Shapefile%20Library/
+https://github.com/sarkaraj/pyshp
+http://matplotlib.org/
