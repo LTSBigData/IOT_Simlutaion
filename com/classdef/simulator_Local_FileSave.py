@@ -14,8 +14,12 @@ import com.geoSpatialMap.geoLocation_User as glu
 project_dir = path.dirname(path.dirname(os.getcwd()))
 
 # Define the output file paths
-user_history = project_dir + '/output/user_history_' + str(dt.datetime.today()) + '.csv'
-user_register = project_dir + '/output/user_master_data_' + str(dt.datetime.today()) + '.csv'
+# user_history = project_dir + '/output/user_history_' + str(dt.datetime.today()) + '.csv'
+# user_register = project_dir + '/output/user_master_data_' + str(dt.datetime.today()) + '.csv'
+
+# For windows machines
+user_history = project_dir + '\\output\\user_history_' + str(dt.datetime.now().date().today()) + '.csv'
+user_register = project_dir + '\\output\\user_master_data_' + str(dt.datetime.now().date().today()) + '.csv'
 
 user_history = usr.fileInitiate(user_history)
 user_register = usr.fileInitiate(user_register)
@@ -191,4 +195,4 @@ user_history.close()
 user_register.close()
 
 print dt.datetime.now()
-# print len(master_User_List)
+print len(master_User_List)

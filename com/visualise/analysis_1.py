@@ -7,7 +7,7 @@ from mpl_toolkits.basemap import Basemap
 
 project_dir = path.dirname(path.dirname(os.getcwd()))
 
-san_jose_shape_file = project_dir + '/resources/san_jose_shape'
+san_jose_shape_file = project_dir + '/resources/shapefiles/san_jose_shape'
 san_jose_shape = 'san_jose_shape'
 
 
@@ -23,7 +23,12 @@ map.readshapefile(san_jose_shape_file, san_jose_shape)
 
 ###########################################################################
 
-user_data_file = project_dir + '/output/user_history_2017-04-26 19:01:57.007305.csv'
+user_data_file = project_dir + '\\output\\user_history_2017-04-27.csv'
+
+shapeFileName = os.path.basename(user_data_file).split('.')[0]
+
+# print shapeFileName
+
 user_history_dataframe = pd.read_csv(user_data_file, sep=',',
                                      names=["datetime", "user_id", "latitude", "longitude", "pulse", "temp", "age",
                                             "bpCat"],
@@ -34,15 +39,19 @@ user_history_dataframe = pd.read_csv(user_data_file, sep=',',
                                      infer_datetime_format=True,
                                      nrows=10)
 
-# print user_history_dataframe
-
+# Creating shape file for the points
 # lat = user_history_dataframe['latitude']
 # lon = user_history_dataframe['longitude']
+# shapeFilePath = createShapeFile(lat, lon, shapeFileName, project_dir)
 
+# map.readshapefile(shapeFilePath, shapeFileName)
 
-x, y = map(0, 0)
-map.plot(x, y, 'bo', )
-
+# # Using ggplot
+# g = ggplot(aes(x = 'latitude', y = 'latitude'), data=user_history_dataframe) +\
+#     geom_line() +\
+#     stat_smooth(color = 'blue', span = 0.2)
+#
+# print g
 ###########################################################################
 
 plt.show()
