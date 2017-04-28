@@ -14,12 +14,13 @@ import com.geoSpatialMap.geoLocation_User as glu
 project_dir = path.dirname(path.dirname(os.getcwd()))
 
 # Define the output file paths
-# user_history = project_dir + '/output/user_history_' + str(dt.datetime.today()) + '.csv'
-# user_register = project_dir + '/output/user_master_data_' + str(dt.datetime.today()) + '.csv'
+# For Mac and linux
+user_history = project_dir + '/output/user_history_' + str(dt.datetime.today()) + '.csv'
+user_register = project_dir + '/output/user_master_data_' + str(dt.datetime.today()) + '.csv'
 
-# For windows machines
-user_history = project_dir + '\\output\\user_history_' + str(dt.datetime.now().date().today()) + '.csv'
-user_register = project_dir + '\\output\\user_master_data_' + str(dt.datetime.now().date().today()) + '.csv'
+# # For windows machines
+# user_history = project_dir + '\\output\\user_history_' + str(dt.datetime.now().date().today()) + '.csv'
+# user_register = project_dir + '\\output\\user_master_data_' + str(dt.datetime.now().date().today()) + '.csv'
 
 user_history = usr.fileInitiate(user_history)
 user_register = usr.fileInitiate(user_register)
@@ -153,7 +154,7 @@ def get_Age_Limits(category):
 
 
 # Pre-populating the master user list
-updateUserList(simulation_World_Time, n=500)
+updateUserList(simulation_World_Time, n=5000)
 
 print MUL + "Pre-populated with :" + str(len(master_User_List)) + " users"
 
