@@ -166,11 +166,13 @@ fignum += 1
 # We shall keep checking the sil. coefficient and try to obtain the highest plausible positive value.
 # MiniBatchKmeans is used since the number of samples in the dataset is quite high. If KMeans() is just used,
 # python is simply crashing.
-cluster_points = {'k_means_10': MiniBatchKMeans(n_clusters=10),
+cluster_points = {'k_means_2': MiniBatchKMeans(n_clusters=2),
+                  'k_means_4': MiniBatchKMeans(n_clusters=4),
+                  'k_means_6': MiniBatchKMeans(n_clusters=6),
+                  'k_means_8': MiniBatchKMeans(n_clusters=8),
+                  'k_means_10': MiniBatchKMeans(n_clusters=10),
                   'k_means_12': MiniBatchKMeans(n_clusters=12),
-                  'k_means_14': MiniBatchKMeans(n_clusters=14),
-                  'k_means_16': MiniBatchKMeans(n_clusters=16),
-                  'k_means_20': MiniBatchKMeans(n_clusters=20)}
+                  'k_means_14': MiniBatchKMeans(n_clusters=14)}
 
 X = latest_loc[['longitude', 'latitude']]
 
@@ -185,17 +187,16 @@ for choice, estimator in cluster_points.items():
 
     kmeans_predict = kmeans.predict(X)
     column_Name = choice + '_labels'
-    X[column_Name] = kmeans_predict
     latest_loc[column_Name] = kmeans_predict
 
-    for name, group in X.groupby(by=[column_Name]):
+    for name, group in latest_loc.groupby(by=[column_Name]):
         _x, _y = map1(group['longitude'], group['latitude'])
         map1.scatter(_x, _y, latlon=True, marker='d', s=3, cmap='Vega20', alpha=0.5)
 
-    _x, _y = map1(centroid_lon, centroid_lat)
-    map1.scatter(_x, _y, latlon=True, marker='8', s=20, color='red')
+    # _x, _y = map1(centroid_lon, centroid_lat)
+    # map1.scatter(_x, _y, latlon=True, marker='8', s=20, color='red')
     subtitle = "\nSilhouette Coefficient: " + str(
-        metrics.silhouette_score(X[['longitude', 'latitude']], X[column_Name]))
+        metrics.silhouette_score(latest_loc[['longitude', 'latitude']], latest_loc[column_Name]))
     plt.title(plot_title + subtitle)
     save_location = project_dir + '/output/images/' + str(fignum) + '_' + shapeFileName + '_' + choice + '.png'
     plt.savefig(save_location, format='png', dpi=1000, bbox_inches='tight')
