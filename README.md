@@ -57,4 +57,4 @@ A link to a detailed documentation is provided at the end.
 
 We start off first by analysing the whole set of points first.
 
-![Initial Plot - Before data cleaning](output/images/1_user_history_2017-04-27 21:18:01_allpoints copy.png)
+![Initial Plot - Before data cleaning](https://github.com/sarkaraj/IOT_Simlutaion/blob/master/output/images/1_user_history_2017-04-27%2021:18:01_allpoints%20copy.png)
