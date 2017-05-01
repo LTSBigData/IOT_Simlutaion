@@ -55,7 +55,7 @@ A link to a detailed documentation is provided in the repository.
 
 ## Analysis
 
-We start off first by analysing the whole set of points first.
+We start off first by visualising the whole set of points first.
 
 ##### Stage 1
 ![Initial Plot - Before data cleaning](https://github.com/sarkaraj/IOT_Simlutaion/blob/master/output/images/1_user_history_2017-04-27%2021:18:01_allpoints%20copy.png)
@@ -70,9 +70,9 @@ plotting to make it more readable.
 ##### Stage 2
 ![Second Plot - Plotting user paths and latest location](https://github.com/sarkaraj/IOT_Simlutaion/blob/master/output/images/2_user_history_2017-04-27%2021:18:01_grouped%20copy.png)
 
-Only the user's final location data are of interest to us. The *blue dots* represent the latest
+Only the user's final location data (current location of user) are of interest to us. The *blue dots* represent the latest
 locaiton while the *red dots* shows the path of the users (although it can't be figured out from
-this plot due to to sheer number). At next stages we'll be dealing with only the latest location.
+this plot). At next stages we'll be dealing with only the latest location.
 
 ##### Stage 3
 ![Third Plot - DBSCAN with noise](https://github.com/sarkaraj/IOT_Simlutaion/blob/master/output/images/3_user_history_2017-04-27%2021:18:01_DBSCAN%20copy.png)

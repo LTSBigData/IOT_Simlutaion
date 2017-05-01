@@ -29,7 +29,8 @@ def fileInitiate(_path):
 
 
 class user(object):
-    def __init__(self, age, gender, category, sleep_count, initiation_Time, user_register_file, user_history_file):
+    def __init__(self, age, gender, category, sleep_count, initiation_Time, user_register_file, user_history_file,
+                 user_history_with_labels_file):
         self.age = age  # User age
         self.gender = gender  # User Gender
         self.sleep_count = sleep_count  # measure of rate of update of geo-location
@@ -47,7 +48,7 @@ class user(object):
         self.pulse = initPulse(self.age)
         self.temp = initBodyTemp()
         userRegistration(self, user_register_file)
-        user_current_data(initiation_Time, self, user_history_file)
+        user_current_data(initiation_Time, self, user_history_file, user_history_with_labels_file)
 
 
 def determine_Height_And_Weight(age, gender):
@@ -626,9 +627,11 @@ def getUser_FITBIT(user):
     return value
 
 
-def user_current_data(timestring, user, file):
-    message = str(timestring) + "," + getUser_FITBIT(user) + '\n'
-    file.write(message)
+def user_current_data(timestring, user, user_history_file, user_history_with_labels_file):
+    message1 = str(timestring) + "," + getUser_FITBIT(user) + '\n'
+    user_history_file.write(message1)
+    message2 = str(timestring) + "," + getUser_FITBIT(user) + "," + getUserUrgencyLevel(user) + '\n'
+    user_history_with_labels_file.write(message2)
 
 
 def getUser_Details(user):
@@ -655,3 +658,21 @@ def userRegistration(user, file):
     """
     message = getUser_Details(user) + '\n'
     file.write(message)
+
+
+def getUserUrgencyLevel(user):
+    if user.pulse >= 0.95 * maxPulseLimit(user.age):
+        if user.bpCategory in ["HYP_1", "HYP_2", "HYP_CR"]:
+            return str(2)
+        elif user.bpCategory in ["LOW", "NORMAL", "PREHYP"]:
+            return str(1)
+    else:
+        return str(0)
+        # return None
+
+
+def maxPulseLimit(age):
+    if age < 40:
+        return 220 - age
+    else:
+        return 208 - (0.75 * age)

@@ -17,6 +17,7 @@ project_dir = path.dirname(path.dirname(os.getcwd()))
 # For Mac and linux
 user_history = project_dir + '/output/user_history_' + str(dt.datetime.today()) + '.csv'
 user_register = project_dir + '/output/user_master_data_' + str(dt.datetime.today()) + '.csv'
+user_history_with_labels = project_dir + '/output/user_history_with_labels_' + str(dt.datetime.today()) + '.csv'
 
 # # For windows machines
 # user_history = project_dir + '\\output\\user_history_' + str(dt.datetime.now().date().today()) + '.csv'
@@ -24,6 +25,7 @@ user_register = project_dir + '/output/user_master_data_' + str(dt.datetime.toda
 
 user_history = usr.fileInitiate(user_history)
 user_register = usr.fileInitiate(user_register)
+user_history_with_labels = usr.fileInitiate(user_history_with_labels)
 
 ##########################################################################
 
@@ -86,35 +88,40 @@ def add_User_To_List(age, gender, simulation_World_Time):
         sleep_count = 0
         master_User_List.append(usr.user(age=age, gender=gender, category=5, sleep_count=sleep_count,
                                          initiation_Time=simulation_World_Time, user_register_file=user_register,
-                                         user_history_file=user_history))
+                                         user_history_file=user_history,
+                                         user_history_with_labels_file=user_history_with_labels))
         return None
 
     elif choice_of_userCategory == "MOD_ACTIVE":
         sleep_count = 1
         master_User_List.append(usr.user(age=age, gender=gender, category=4, sleep_count=sleep_count,
                                          initiation_Time=simulation_World_Time, user_register_file=user_register,
-                                         user_history_file=user_history))
+                                         user_history_file=user_history,
+                                         user_history_with_labels_file=user_history_with_labels))
         return None
 
     elif choice_of_userCategory == "LIGHT_ACTIVE":
         sleep_count = 2
         master_User_List.append(usr.user(age=age, gender=gender, category=3, sleep_count=sleep_count,
                                          initiation_Time=simulation_World_Time, user_register_file=user_register,
-                                         user_history_file=user_history))
+                                         user_history_file=user_history,
+                                         user_history_with_labels_file=user_history_with_labels))
         return None
 
     elif choice_of_userCategory == "SEDENTARY":
         sleep_count = 3
         master_User_List.append(usr.user(age=age, gender=gender, category=2, sleep_count=sleep_count,
                                          initiation_Time=simulation_World_Time, user_register_file=user_register,
-                                         user_history_file=user_history))
+                                         user_history_file=user_history,
+                                         user_history_with_labels_file=user_history_with_labels))
         return None
 
     elif choice_of_userCategory == "NO_ACTIVITY":
         sleep_count = 4
         master_User_List.append(usr.user(age=age, gender=gender, category=1, sleep_count=sleep_count,
                                          initiation_Time=simulation_World_Time, user_register_file=user_register,
-                                         user_history_file=user_history))
+                                         user_history_file=user_history,
+                                         user_history_with_labels_file=user_history_with_labels))
         return None
 
 
@@ -162,7 +169,7 @@ print MUL + "Pre-populated with :" + str(len(master_User_List)) + " users"
 simulation_World_Time = simulation_World_Time + dt.timedelta(minutes=5)
 
 # total_hours keeps a measure of the time in the simulation.
-total_hours = (24 * 60) / 5
+total_hours = (48 * 60) / 5
 
 print dt.datetime.now()
 
@@ -187,7 +194,7 @@ while (total_hours != 0):
         for i in range(len(master_User_List)):
             glu.updateLocation_User(master_User_List[i])
             usr.updatePulseTemp_User(master_User_List[i])
-            usr.user_current_data(simulation_World_Time, master_User_List[i], user_history)
+            usr.user_current_data(simulation_World_Time, master_User_List[i], user_history, user_history_with_labels)
 
     simulation_World_Time = simulation_World_Time + dt.timedelta(minutes=5)
     total_hours -= 1
